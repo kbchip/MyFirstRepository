@@ -1,0 +1,17 @@
+---
+title: 'STA 445 Assignment #8'
+author: "Chip Haskins"
+date: "2024-11-15"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+
+```
+
+# GitHub Page
+
+[kbchip](https://github.com/kbchip)
+
+# MyFirstRepository Repo
+

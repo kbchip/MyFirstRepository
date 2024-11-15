@@ -1,0 +1,195 @@
+---
+title: 'STA 445 Assignment #7'
+author: "Chip Haskins"
+date: "2024-11-06"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(viridis)
+library(latex2exp)
+```
+
+### Exercise 2 {-}
+
+Using the `datasets::trees` data, complete the following. This question refreshes create a linear model, graphing the linear model, and introduces using some LaTeX expressions on the graph.
+
+**a)** Create a regression model for $y=$ `Volume` as a function of $x=$ `Height`.
+
+```{r}
+trees.lm <- lm(Volume ~ Height, trees)
+trees.lm
+```
+
+**b)** Display the `summary` of the  model to view the y-intercept and slope of the regression line.
+
+```{r}
+summary(trees.lm)
+```
+
+**c)** Using `ggplot2`, create a scatter plot of Volume vs Height. 
+
+```{r}
+ggplot(trees, aes(x = Height, y = Volume)) +
+  geom_point()
+```
+
+**d)** Color the scatter using the `Girth` variable.
+
+```{r}
+ggplot(trees, aes(x = Height, y = Volume)) +
+  geom_point(aes(color = Girth))
+```
+
+**e)** Modify the color scheme using a RColorBrewer palette.
+
+```{r}
+ggplot(trees, aes(x = Height, y = Volume)) +
+  geom_point(aes(color = Girth)) +
+  scale_color_distiller(palette = "Greens")
+```
+
+**f)** Create a nice white filled rectangle to add text information. The following might be useful.
+
+```{r}
+ggplot(trees, aes(x = Height, y = Volume)) +
+  geom_point(aes(color = Girth)) +
+  scale_color_distiller(palette = "Greens") +
+  annotate('rect', xmin=65, xmax=75, ymin=60, ymax=74,
+         fill='white', color='black')
+```
+
+**g)** Use the `broom` package to extract the coefficients of the best-fit line. Add this information as an annotation to the graph, which should follow a form that looks like $\hat{y}_i = (INTERCEPT) + (SLOPE)* x_i$. Place the annotation within the white text box.
+
+```{r}
+trees.lm.coefs <- broom::tidy(trees.lm)
+trees.lm.intercept <- filter(trees.lm.coefs, term == "(Intercept)") %>%
+  pull(estimate) %>%
+  round(3)
+trees.lm.slope <- filter(trees.lm.coefs, term == "Height") %>%
+  pull(estimate) %>%
+  round(3)
+
+ggplot(trees, aes(x = Height, y = Volume)) +
+  geom_point(aes(color = Girth)) +
+  scale_color_distiller(palette = "Greens") +
+  annotate('rect', xmin=65, xmax=75, ymin=60, ymax=74,
+         fill='white', color='black') +
+  annotate("text", x = 70, y = 67, 
+           label = TeX(r"($\hat{y}_i = \intercept + \slope*x_i$)",
+                       user_defined = list("\\intercept" = trees.lm.intercept,
+                                           "\\slope" = trees.lm.slope)))
+```
+
+**h)** Use the `broom` package to extract the coefficient of determination $r^2$ from the model. Add the annotation to your graph, which should look something like $R^2 = (VALUE)$
+
+```{r}
+trees.lm.rsquared = broom::glance(trees.lm) %>%
+  pull(r.squared) %>%
+  round(3)
+
+ggplot(trees, aes(x = Height, y = Volume)) +
+  geom_point(aes(color = Girth)) +
+  scale_color_distiller(palette = "Greens") +
+  annotate('rect', xmin=65, xmax=75, ymin=60, ymax=74,
+         fill='white', color='black') +
+  annotate("text", x = 70, y = 69, 
+           label = TeX(r"($\hat{y}_i = \intercept + \slope*x_i$)",
+                       user_defined = list("\\intercept" = trees.lm.intercept,
+                                           "\\slope" = trees.lm.slope))) +
+  annotate("text", x = 70, y = 65, 
+           label = TeX(r"($R^2 = \rsquared$)",
+                       user_defined = list("\\rsquared" = trees.lm.rsquared)))
+```
+
+**i)** Add the regression line in red. There are several ways to do this.
+
+```{r}
+trees.predicted <- broom::augment(trees.lm, trees)
+
+ggplot(trees, aes(x = Height, y = Volume)) +
+  geom_point(aes(color = Girth)) +
+  scale_color_distiller(palette = "Greens") +
+  annotate('rect', xmin=65, xmax=75, ymin=60, ymax=74,
+         fill='white', color='black') +
+  annotate("text", x = 70, y = 69, 
+           label = TeX(r"($\hat{y}_i = \intercept + \slope*x_i$)",
+                       user_defined = list("\\intercept" = trees.lm.intercept,
+                                           "\\slope" = trees.lm.slope))) +
+  annotate("text", x = 70, y = 65, 
+           label = TeX(r"($R^2 = \rsquared$)",
+                       user_defined = list("\\rsquared" = trees.lm.rsquared))) +
+  geom_line(data = trees.predicted, aes(y = .fitted), color = "red")
+```
+
+**j)** Properly label the axes of the graph.
+
+```{r}
+ggplot(trees, aes(x = Height, y = Volume)) +
+  geom_point(aes(color = Girth)) +
+  scale_color_distiller(palette = "Greens") +
+  annotate('rect', xmin=65, xmax=75, ymin=60, ymax=74,
+         fill='white', color='black') +
+  annotate(
+    "text", 
+    x = 70, 
+    y = 69, 
+    label = TeX(
+      r"($\hat{y}_i = \intercept + \slope*x_i$)",
+      user_defined = list("\\intercept" = trees.lm.intercept,
+                          "\\slope" = trees.lm.slope)
+      )
+    ) +
+  annotate(
+    "text", 
+    x = 70, 
+    y = 65, 
+    label = TeX(
+      r"($R^2 = \rsquared$)",
+      user_defined = list("\\rsquared" = trees.lm.rsquared)
+      )
+    ) +
+  geom_line(data = trees.predicted, aes(y = .fitted), color = "red") +
+  labs(
+    x = "Tree height (ft)", 
+    y = TeX("Volume of timber produced $(ft^3)$"), 
+    color = "Trunk diameter (in)"
+    )
+```
+
+**k)** Add a descriptive title to the graph.
+
+```{r}
+ggplot(trees, aes(x = Height, y = Volume)) +
+  geom_point(aes(color = Girth)) +
+  scale_color_distiller(palette = "Greens") +
+  annotate('rect', xmin=65, xmax=75, ymin=60, ymax=74,
+         fill='white', color='black') +
+  annotate(
+    "text", 
+    x = 70, 
+    y = 69, 
+    label = TeX(
+      r"($\hat{y}_i = \intercept + \slope*x_i$)",
+      user_defined = list("\\intercept" = trees.lm.intercept,
+                          "\\slope" = trees.lm.slope)
+      )
+    ) +
+  annotate(
+    "text", 
+    x = 70, 
+    y = 65, 
+    label = TeX(
+      r"($R^2 = \rsquared$)",
+      user_defined = list("\\rsquared" = trees.lm.rsquared)
+      )
+    ) +
+  geom_line(data = trees.predicted, aes(y = .fitted), color = "red") +
+  labs(
+    title = "Volume and Diameter of Black Cherry Trees by Height",
+    x = "Tree height (ft)", 
+    y = TeX("Volume of timber produced $(ft^3)$"), 
+    color = "Trunk diameter (in)"
+    )
+```

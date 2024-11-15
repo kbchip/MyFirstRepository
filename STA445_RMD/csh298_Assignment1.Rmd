@@ -1,0 +1,179 @@
+---
+title: 'STA 445 Assignment #1'
+author: "Chip Haskins"
+date: "2024-10-02"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+### Exercise 1 {-}
+
+Create a vector of three elements (2,4,6) and name that vector `vec_a`. Create a second vector, `vec_b`, that contains $(8,10,12)$. Add these two vectors together and name the result `vec_c`.
+
+```{r}
+vec_a <- c(2,4,6)
+vec_b <- c(8,10,12)
+vec_c <- vec_a + vec_b
+vec_c
+```
+
+### Exercise 2 {-}
+
+Create a vector, named `vec_d`, that contains only two elements (14,20). Add this vector to `vec_a`. What is the result and what do you think R did (look up the recycling rule using Google)? What is the warning message that R gives you?
+
+```{r}
+vec_d <- c(14,20)
+vec_d + vec_a
+```
+The result is `[1] 16 24 20`, meaning R started repeating the shorter vector when adding it to the longer vector. Specifically, it extended `vec_d` from (14,20) to (14,20,14) to match the length of `vec_a`. The warning message informs us that `vec_a` does not have a length that is a clean multiple of `vec_d`'s length, so the recycling does not repeat `vec_d` completely.
+
+### Exercise 3 {-}
+
+Next add $5$ to the vector `vec_a`. What is the result and what did R do? Why doesn't in give you a warning message similar to what you saw in the previous problem?
+
+```{r}
+vec_a + 5
+```
+R created the result, `[1] 7 9 11`, by adding $5$ to each element in `vec_a`. This is the same as adding a vector of the same length as `vec_a` which is filled with $5$s as each element.
+
+### Exercise 5 {-}
+
+Generate the vector of even numbers $\left\{ 2,4,6,\dots,20\right\}$
+
+**a)** Using the `seq()` function and
+```{r}
+seq(2,20,2)
+```
+
+**b)** Using the a:b shortcut and some subsequent algebra. *Hint: Generate a sequence of integers then multiple by 2*.
+
+```{r}
+1:10 * 2
+```
+
+### Exercise 6 {-}
+
+Generate a vector of $21$ elements that are evenly placed between $0$ and $1$ using the `seq()` command and name this vector `x`. 
+
+```{r}
+x <- seq(0,1,length.out=21)
+x
+```
+
+### Exercise 8 {-}
+
+Generate the vector $\left\{ 2,2,2,2,4,4,4,4,8,8,8,8\right\}$ using the `rep()` command. You might need to check the help file for `rep()`. In particular, look at the optional argument `each=`.
+
+```{r}
+rep(c(2,4,8), each=4)
+```
+
+### Exercise 11 {-}
+
+Create and manipulate a data frame.
+
+**a)** Create a `data.frame` named `my.trees` that has the following columns:
+
+  + Girth = {8.3, 8.6, 8.8, 10.5, 10.7, 10.8, 11.0}
+  + Height= {70, 65, 63, 72, 81, 83, 66}
+  + Volume= {10.3, 10.3, 10.2, 16.4, 18.8, 19.7, 15.6}
+
+```{r}
+my.trees <- data.frame(
+  Girth = c(8.3, 8.6, 8.8, 10.5, 10.7, 10.8, 11.0),
+  Height= c(70, 65, 63, 72, 81, 83, 66),
+  Volume= c(10.3, 10.3, 10.2, 16.4, 18.8, 19.7, 15.6)
+)
+my.trees
+```
+  
+Complete the following without using `dplyr` functions
+
+**b)** Extract the third observation (i.e. the third row)
+
+```{r}
+my.trees[3,]
+```
+
+
+**c)** Extract the Girth column referring to it by name (don't use a numerical value based on column position).
+
+```{r}
+my.trees['Girth'] # or my.trees$Girth
+```
+
+**d)** Print out a data frame of all the observations *except* for the fourth observation. (i.e. Remove the fourth observation/row.)
+
+```{r}
+my.trees[-4,]
+```
+
+**e)** Use the `which()` command to create a vector of row indices that have a `girth` greater than 10. Call that vector `index`.
+
+```{r}
+index <- which(my.trees$Girth > 10)
+index
+```
+
+**f)** Use the `index` vector to create a small data set with just the large girth trees.
+
+```{r}
+data.frame(my.trees[index,])
+```
+
+**g)** Use the `index` vector to create a small data set with just the small girth trees.
+
+```{r}
+data.frame(my.trees[-index,])
+```
+
+
+### Exercise 12 {-}
+
+The following code creates a `data.frame` and then has two different methods for removing the rows with `NA` values in the column `Grade`. Explain the difference between the two.
+
+```{r, eval=FALSE}
+df <- data.frame(name= c('Alice','Bob','Charlie','Daniel'),
+                 Grade = c(6,8,NA,9))
+
+df[ -which(  is.na(df$Grade) ), ]
+df[  which( !is.na(df$Grade) ), ]
+```
+
+The first method returns `df` **without** the rows that cause the expression `is.na(df$Grade)` to evaluate to `TRUE`, removing the rows with `NA` in the `Grade` column. The second method instead returns `df` **with** the rows that cause the negation of the previous expression (`!is.na(df$Grade)`, note the `!` negation) to evaluate to `TRUE`. This functionally does the same thing, but these methods differ in *how* they remove the desired rows.
+    
+### Exercise 14 {-}
+
+Create and manipulate a list.
+
+**a)** Create a list named my.test with elements
+
+  + x = c(4,5,6,7,8,9,10)
+  + y = c(34,35,41,40,45,47,51)
+  + slope = 2.82
+  + p.value = 0.000131
+
+```{r}
+my.test <- list(
+  x = c(4,5,6,7,8,9,10),
+  y = c(34,35,41,40,45,47,51),
+  slope = 2.82,
+  p.value = 0.000131
+)
+my.test
+```
+  
+**b)** Extract the second element in the list.
+
+```{r}
+my.test[2]
+```
+
+**c)** Extract the element named `p.value` from the list.
+
+```{r}
+my.test['p.value'] # or my.test$p.value
+```
